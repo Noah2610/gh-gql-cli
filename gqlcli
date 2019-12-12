@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# shellcheck source=./util.sh
+_dir="$( dirname "$0" )"
+[ -f "${_dir}/util.sh" ] || bash "${_dir}/download-util.sh" || exit 1
+source "${_dir}/util.sh"
+unset _dir
+
+SCRIPT_NAME="$0"
+HELP_TEXT="$( cat <<HELP_END
+$( colored "$COLOR_MSG_STRONG" "DESCRIPTION" )
+    $( colored "$COLOR_CODE" "$SCRIPT_NAME" ) - Helper script for sending graphql queries to GitHub.
+
+$( colored "$COLOR_MSG_STRONG" "USAGE" )
+    $( colored "$COLOR_CODE" "$SCRIPT_NAME [OPTIONS] QUERY_FILE" )
+
+$( colored "$COLOR_MSG_STRONG" "ARGUMENTS" )
+    $( colored "$COLOR_CODE" "QUERY_FILE" )
+        Path to a file containing a graphql query.
+
+$( colored "$COLOR_MSG_STRONG" "OPTIONS" )
+    $( colored "$COLOR_CODE" "--help, -h" )
+        Prints this usage text and exits.
+
+    $( colored "$COLOR_CODE" "--token-file, -T <TOKEN_FILE>" )
+        Path to a file containing your GitHub token.
+        The GitHub token is necessary for queries.
+        $( colored "$COLOR_MSG" "Optional" ); defaults to $( colored "$COLOR_CODE" "./GH_TOKEN" ) when omitted.
+        Generate your token from your GitHub account's settings page under:
+            Developer settings -> Personal access tokens
+            $( colored "$COLOR_CODE" "https://github.com/settings/tokens" )
+
+    $( colored  "$COLOR_CODE" "--token, -t <TOKEN>" )
+        Pass your GitHub token on the command-line with this option.
+        $( colored "$COLOR_ERR" "NOT RECOMMENDED:" ) It's unsafe to type secrets on the command-line this.
+        Prefer --token-file option.
+
+$( colored "$COLOR_MSG_STRONG" "EXAMPLES" )
+$( colored "$COLOR_CODE" "\
+    # Run the query in the file \"./my-query.graphql\",
+    # using the GitHub token in the file \"./my-gh-token\"
+    $SCRIPT_NAME --token-file ./my-gh-token ./my-query.graphql
+    # Equivalent:
+    $SCRIPT_NAME -T ./my-gh-token ./my-query.graphql\
+" )
+
+$( colored "$COLOR_MSG_STRONG" "NOTES" )
+    If you have $( colored "$COLOR_CODE" "jq" ) installed, then the JSON output
+    returned from the query request will be prettified using $( colored "$COLOR_CODE" "jq" ).
+    $( colored "$COLOR_CODE" "https://stedolan.github.io/jq/" )
+HELP_END
+)"
+
+function graphql_req {
+    check "curl"
+    check "sed"
+    check "tr"
+
+    GH_API_ENDPOINT="https://api.github.com/graphql"
+
+    local query
+    query="$( echo -n "$QUERY" | tr "\n" "\r" | sed 's/\s\+/ /g' | sed 's/"/\\"/g' )"
+
+    local pipe_into="cat"
+    is_available "jq" && pipe_into="jq"
+
+    curl \
+        -H "Accept: application/vnd.github.package-deletes-preview+json" \
+        -H "Authorization: bearer ${GH_TOKEN}" \
+        -X POST \
+        -d "\
+            { \
+                \"query\": \"${query}\" \
+            } \
+        " \
+        "$GH_API_ENDPOINT" \
+        | "$pipe_into"
+
+}
+
+function print_help_and_exit {
+    echo -e "$HELP_TEXT"
+    exit 0
+}
+
+GH_TOKEN=
+# Default GitHub token file
+GH_TOKEN_FILE="./GH_TOKEN"
+QUERY_FILE=
+
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        "--help"|"-h")
+            print_help_and_exit
+            ;;
+        "--token"|"-t")
+            msg "\
+WARNING:\033[m
+    It is unsafe to pass your GitHub token over the command-line.
+    Consider using the $( colored "$COLOR_CODE" "--token-file" ) option instead.
+    See $( colored "$COLOR_CODE" "--help" ) for more info."
+            GH_TOKEN="$1"
+            shift
+            ;;
+        "--token-file"|"-T")
+            GH_TOKEN_FILE="$1"
+            shift
+            ;;
+        *)
+            # Set query file
+            QUERY_FILE="$1"
+            ;;
+    esac
+
+    shift
+done
+
+# Verify GitHub token
+if [ -z "$GH_TOKEN" ]; then
+    check_file "$GH_TOKEN_FILE"
+    GH_TOKEN="$( cat "$GH_TOKEN_FILE" )"
+fi
+[ -z "$GH_TOKEN" ] && err "Empty GitHub token"
+
+# Verify query file
+[ -z "$QUERY_FILE" ] && err "No $( colored  "$COLOR_CODE" "QUERY_FILE" ) given as argument"
+
+check_file "$QUERY_FILE"
+QUERY="$( cat "$QUERY_FILE" )"
+[ -z "$QUERY" ] && err "Empty query"
+
+graphql_req

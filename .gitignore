@@ -1,0 +1,5 @@
+util.sh
+logs
+*.log
+GH_TOKEN
+*.graphql
