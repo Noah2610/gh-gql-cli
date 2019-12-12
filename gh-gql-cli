@@ -67,16 +67,16 @@ function graphql_req {
     local pipe_into="cat"
     is_available "jq" && pipe_into="jq"
 
-    curl \
+    (2> /dev/null curl \
         -H "Accept: application/vnd.github.package-deletes-preview+json" \
         -H "Authorization: bearer ${GH_TOKEN}" \
         -X POST \
         -d "\
-            { \
-                \"query\": \"${query}\" \
-            } \
+        { \
+            \"query\": \"${query}\" \
+        } \
         " \
-        "$GH_API_ENDPOINT" \
+        "$GH_API_ENDPOINT") \
         | "$pipe_into"
 
 }
