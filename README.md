@@ -62,3 +62,8 @@ NOTES
     GitHub's graphql API preview feature deletePackageVersion is enabled with this script.
     https://developer.github.com/v4/mutation/deletepackageversion
 ```
+
+## License
+Distributed under the terms of the [MIT License][mit].
+
+[mit]: https://github.com/Noah2610/gqlcli/blob/master/LICENSE
