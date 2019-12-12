@@ -47,7 +47,10 @@ $( colored "$COLOR_CODE" "\
 $( colored "$COLOR_MSG_STRONG" "NOTES" )
     If you have $( colored "$COLOR_CODE" "jq" ) installed, then the JSON output
     returned from the query request will be prettified using $( colored "$COLOR_CODE" "jq" ).
-    $( colored "$COLOR_CODE" "https://stedolan.github.io/jq/" )
+    $( colored "$COLOR_CODE" "https://stedolan.github.io/jq" )
+
+    GitHub's graphql API preview feature $( colored "$COLOR_CODE" "deletePackageVersion" ) is enabled with this script.
+    $( colored "$COLOR_CODE" "https://developer.github.com/v4/mutation/deletepackageversion" )
 HELP_END
 )"
 
