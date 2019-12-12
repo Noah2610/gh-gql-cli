@@ -103,11 +103,11 @@ WARNING:\033[m
     It is unsafe to pass your GitHub token over the command-line.
     Consider using the $( colored "$COLOR_CODE" "--token-file" ) option instead.
     See $( colored "$COLOR_CODE" "--help" ) for more info."
-            GH_TOKEN="$1"
+            GH_TOKEN="$2"
             shift
             ;;
         "--token-file"|"-T")
-            GH_TOKEN_FILE="$1"
+            GH_TOKEN_FILE="$2"
             shift
             ;;
         *)
