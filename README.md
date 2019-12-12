@@ -1,4 +1,4 @@
-# gqlcli
+# gh-gql-cli
 __GitHub GraphQL API helper script__.  
 Simplifies sending GraphQL requests to GitHub's API endpoint,  
 using `curl` with your query files.
@@ -8,23 +8,23 @@ __TODO:__ Provide as `zip` releases.
 
 Clone the repository ...
 ```
-git clone https://github.com/Noah2610/gqlcli
+git clone https://github.com/Noah2610/gh-gql-cli
 ```
-and run the script in the cloned directory, after `cd gqlcli` into it ...
+and run the script in the cloned directory, after `cd gh-gql-cli` into it ...
 ```
-./gqlcli --help
+./gh-gql-cli --help
 ```
 
 ## Usage
 ```
-./gqlcli --help
+./gh-gql-cli --help
 ```
 ```
 DESCRIPTION
-    ./gqlcli - Helper script for sending graphql queries to GitHub.
+    ./gh-gql-cli - Helper script for sending graphql queries to GitHub.
 
 USAGE
-    ./gqlcli [OPTIONS] QUERY_FILE
+    ./gh-gql-cli [OPTIONS] QUERY_FILE
 
 ARGUMENTS
     QUERY_FILE
@@ -50,9 +50,9 @@ OPTIONS
 EXAMPLES
     # Run the query in the file "./my-query.graphql",
     # using the GitHub token in the file "./my-gh-token"
-    ./gqlcli --token-file ./my-gh-token ./my-query.graphql
+    ./gh-gql-cli --token-file ./my-gh-token ./my-query.graphql
     # Equivalent:
-    ./gqlcli -T ./my-gh-token ./my-query.graphql
+    ./gh-gql-cli -T ./my-gh-token ./my-query.graphql
 
 NOTES
     If you have jq installed, then the JSON output
@@ -66,4 +66,4 @@ NOTES
 ## License
 Distributed under the terms of the [MIT License][mit].
 
-[mit]: https://github.com/Noah2610/gqlcli/blob/master/LICENSE
+[mit]: https://github.com/Noah2610/gh-gql-cli/blob/master/LICENSE
